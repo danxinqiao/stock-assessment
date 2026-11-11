@@ -1,0 +1,18 @@
+name = "stock-assessment"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-07-11"
+
+# D1：先在 Pages 项目里建好库，再把 id 填进来
+[[d1_databases]]
+binding = "DB"
+database_name = "stock-journal"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+[vars]
+STOCK_SECID = "1.000001"
+WX_PUSH_URL = "https://hpbnvpiosrzhgyxbrwpt.supabase.co/functions/v1/wx-push"
+
+# 以下三个走 secret，不要写在这里：
+#   wrangler pages secret put CRON_SECRET
+#   wrangler pages secret put WX_PUSH_TOKEN
+#   wrangler pages secret put WX_TOKEN
