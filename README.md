@@ -68,6 +68,8 @@ wrangler pages dev dist   # 前后端一起跑，绑定读 wrangler.toml
 - Output directory：`dist`
 - 环境变量 / D1 绑定：按 `wrangler.toml`（也可在 Pages 面板里配）
 
+需要创建cloudflare的token
+
 ## 接口
 
 | 方法 | 路径 | 说明 |
