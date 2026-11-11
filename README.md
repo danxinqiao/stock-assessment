@@ -91,3 +91,5 @@ wrangler pages dev dist   # 前后端一起跑，绑定读 wrangler.toml
 - `percent`（当日涨跌幅）不入库，由东方财富日 K 现取，进程内缓存 10 分钟；取不到时前端显示 `—`。
 - `/api/log` 除 `items`、`next` 外还返回 `tradingDays`（最近 140 个交易日），供贡献图区分「没判断」和「非交易日」。
 - 微信重复推送（重试）靠 UPSERT 幂等兜底，不设 MsgId 去重表。
+
+## 测试
