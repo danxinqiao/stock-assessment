@@ -6,7 +6,7 @@ compatibility_date = "2026-07-11"
 [[d1_databases]]
 binding = "DB"
 database_name = "stock-journal"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "f5cc80bf-28a3-4155-8045-8bbfe4a77c51"
 
 [vars]
 STOCK_SECID = "1.000001"
