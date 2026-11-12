@@ -8,6 +8,9 @@ binding = "DB"
 database_name = "stock-journal"
 database_id = "f5cc80bf-28a3-4155-8045-8bbfe4a77c51"
 
+[observability.logs]
+enabled = true
+
 [vars]
 STOCK_SECID = "1.000001"
 WX_PUSH_URL = "https://hpbnvpiosrzhgyxbrwpt.supabase.co/functions/v1/wx-push"
