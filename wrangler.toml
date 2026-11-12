@@ -8,6 +8,7 @@ binding = "DB"
 database_name = "stock-journal"
 database_id = "f5cc80bf-28a3-4155-8045-8bbfe4a77c51"
 
+# 开启日志
 [observability.logs]
 enabled = true
 
