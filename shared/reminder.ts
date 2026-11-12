@@ -26,7 +26,7 @@ export async function sendReminder(env: Env): Promise<ReminderResult> {
   const payload = {
     openid,
     date: `${today} ${weekdayCn(now)}`,
-    operate: '回复 1 看涨 · 2 看跌 · 3 看平',
+    operate: '回复 101 看涨 · 102 看跌 · 103 看平',
     tip,
   };
 

@@ -4,21 +4,15 @@ import type { Direction, Env } from '../shared/types';
 import { textReply, verifySignature, xmlField } from '../shared/wechat';
 
 const LABEL: Record<Direction, string> = { up: '看涨', down: '看跌', flat: '看平' };
-const HINT = '回复 1 看涨 · 2 看跌 · 3 看平';
+const HINT = '回复 101 看涨 · 102 看跌 · 103 看平';
 
 function mapGuess(content: string): Direction | null {
   switch (content.trim()) {
-    case '1':
-    case '涨':
-    case '看涨':
+    case '101':
       return 'up';
-    case '2':
-    case '跌':
-    case '看跌':
+    case '102':
       return 'down';
-    case '3':
-    case '平':
-    case '看平':
+    case '103':
       return 'flat';
     default:
       return null;
