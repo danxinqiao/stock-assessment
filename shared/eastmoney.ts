@@ -14,7 +14,79 @@ interface EastmoneyKlineResponse {
   } | null;
 }
 
+/** 东财 secid（如 1.000001）→ 腾讯 symbol（如 sh000001）。 */
+function tencentSymbol(secid: string): string {
+  if (secid.startsWith('0.')) return `sz${secid.slice(2)}`;
+  if (secid.startsWith('1.')) return `sh${secid.slice(2)}`;
+  return secid.replace('.', '');
+}
+
+interface TencentFqklineResponse {
+  code?: number;
+  data?: Record<string, { day?: string[][]; qfqday?: string[][] }> | null;
+}
+
+/** 腾讯日K兜底：涨跌幅 = 相邻收盘价变化率（指数无复权差异）。 */
+async function fetchTencentKlines(secid: string, limit: number): Promise<KlineBar[]> {
+  const symbol = tencentSymbol(secid);
+  const url =
+    `https://web.ifzq.gtimg.cn/appstock/app/fqkline/get` +
+    `?param=${symbol},day,,,${limit},qfq`;
+
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+      Referer: 'https://gu.qq.com/',
+    },
+    signal: AbortSignal.timeout(6000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`tencent http ${response.status}`);
+  }
+
+  const payload = (await response.json()) as TencentFqklineResponse;
+  const node = payload.data?.[symbol];
+  const rows = node?.qfqday ?? node?.day;
+
+  if (!Array.isArray(rows) || rows.length < 2) {
+    throw new Error('tencent returned no klines');
+  }
+
+  const bars: KlineBar[] = [];
+  for (let i = 1; i < rows.length; i += 1) {
+    const close = Number(rows[i][2]);
+    const prev = Number(rows[i - 1][2]);
+    if (!Number.isFinite(close) || !Number.isFinite(prev) || prev === 0) continue;
+    bars.push({ date: rows[i][0], pct: ((close - prev) / prev) * 100 });
+  }
+
+  if (bars.length === 0) {
+    throw new Error('tencent klines unparsable');
+  }
+
+  return bars;
+}
+
 export async function fetchKlines(secid: string, limit = 30): Promise<KlineBar[]> {
+  let eastmoneyError: unknown;
+  try {
+    return await fetchEastmoneyKlines(secid, limit);
+  } catch (error) {
+    eastmoneyError = error;
+    console.warn(`[eastmoney] primary failed, fallback to tencent: ${String(error)}`);
+  }
+  try {
+    return await fetchTencentKlines(secid, limit);
+  } catch (tencentError) {
+    const em = eastmoneyError instanceof Error ? eastmoneyError.message : String(eastmoneyError);
+    const tx = tencentError instanceof Error ? tencentError.message : String(tencentError);
+    throw new Error(`kline sources failed: eastmoney(${em}); tencent(${tx})`);
+  }
+}
+
+async function fetchEastmoneyKlines(secid: string, limit: number): Promise<KlineBar[]> {
   const url =
     'https://push2his.eastmoney.com/api/qt/stock/kline/get' +
     `?secid=${encodeURIComponent(secid)}` +
