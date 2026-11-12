@@ -1,7 +1,7 @@
-import { cstClock, cstToday } from '../../shared/date';
-import { setMeta, upsertGuess } from '../../shared/db';
-import { isCronAuthorized, json } from '../../shared/http';
-import type { Direction, Env } from '../../shared/types';
+import { cstClock, cstToday } from '../../../shared/date';
+import { setMeta, upsertGuess } from '../../../shared/db';
+import { isCronAuthorized, json } from '../../../shared/http';
+import type { Direction, Env } from '../../../shared/types';
 
 const LABEL: Record<Direction, string> = { up: '看涨', down: '看跌', flat: '看平' };
 const HINT = '回复 101 看涨 · 102 看跌 · 103 看平';
