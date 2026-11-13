@@ -9,10 +9,8 @@ database_name = "stock-journal"
 database_id = "f5cc80bf-28a3-4155-8045-8bbfe4a77c51"
 
 [vars]
+# 占位 CRON_SECRET = "" 
 STOCK_SECID = "1.000001"
+# 占位 WX_PUSH_TOKEN = "" 
 WX_PUSH_URL = "https://hpbnvpiosrzhgyxbrwpt.supabase.co/functions/v1/wx-push"
-
-# 以下三个走 secret，不要写在这里：
-#   wrangler pages secret put CRON_SECRET
-#   wrangler pages secret put WX_PUSH_TOKEN
-#   wrangler pages secret put WX_TOKEN
+# 占位 WX_TOKEN = "" 
