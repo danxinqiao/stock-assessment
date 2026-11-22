@@ -1,6 +1,7 @@
 import { cstClock, cstToday } from '../../../shared/date';
 import { setMeta, upsertGuess } from '../../../shared/db';
-import { isCronAuthorized, json } from '../../../shared/http';
+import { loadEnv } from '../../../shared/flags';
+import { isRequestAuthorized, json } from '../../../shared/http';
 import type { Direction, Env } from '../../../shared/types';
 
 const LABEL: Record<Direction, string> = { up: '看涨', down: '看跌', flat: '看平' };
@@ -26,8 +27,9 @@ interface WxCallbackBody {
   content?: string;
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
-  if (!isCronAuthorized(request, env)) {
+export const onRequestPost: PagesFunction<Env> = async ({ request, env: rawEnv }) => {
+  const env = await loadEnv(rawEnv);
+  if (!(await isRequestAuthorized(request, env))) {
     return json({ error: 'Unauthorized' }, 401);
   }
 

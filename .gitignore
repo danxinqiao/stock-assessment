@@ -3,4 +3,18 @@ dist
 .wrangler
 .dev.vars
 *.local
+*.log
+*.tsbuildinfo
+
+# OS / editor junk
 .DS_Store
+Thumbs.db
+
+# Local env files (keep the example)
+.env
+.env.*
+!.env.example
+
+# AOCI agent host integration (machine-bound; do not commit)
+opencode.json
+opencode.json.backup.*

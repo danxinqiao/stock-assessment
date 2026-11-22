@@ -1,6 +1,7 @@
 import { cstToday, weekdayOf } from '../../shared/date';
 import { listRecent } from '../../shared/db';
 import { getPercentMap } from '../../shared/eastmoney';
+import { loadEnv } from '../../shared/flags';
 import { json } from '../../shared/http';
 import type { Env } from '../../shared/types';
 
@@ -8,7 +9,8 @@ const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
 const TRADING_DAYS_WINDOW = 140;
 
-export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestGet: PagesFunction<Env> = async ({ request, env: rawEnv }) => {
+  const env = await loadEnv(rawEnv);
   const url = new URL(request.url);
   const before = url.searchParams.get('before');
   const rawLimit = Number(url.searchParams.get('limit') ?? DEFAULT_LIMIT);

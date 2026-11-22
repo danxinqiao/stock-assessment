@@ -8,9 +8,21 @@ binding = "DB"
 database_name = "stock-journal"
 database_id = "f5cc80bf-28a3-4155-8045-8bbfe4a77c51"
 
+# 内部签名服务：不走公网
+[[services]]
+binding = "WX_REPLY"
+service = "wx-reply"
+
 [vars]
+# 以下业务变量已迁到 Flagship，保留原配置仅作注释
 # 占位 CRON_SECRET = "" 
-STOCK_SECID = "1.000001"
-# 占位 WX_PUSH_TOKEN = "" 
-WX_PUSH_URL = "https://hpbnvpiosrzhgyxbrwpt.supabase.co/functions/v1/wx-push"
-# 占位 WX_TOKEN = "" 
+# STOCK_SECID = "1.000001"
+# 占位 WX_PUSH_TOKEN = ""（已废弃，统一使用 CRON_SECRET）
+# WX_PUSH_URL = "https://hpbnvpiosrzhgyxbrwpt.supabase.co/functions/v1/wx-push"
+# WX_REPLY_URL = "https://wx.gyegt614.top"
+# 占位 WECHAT_TOKEN = "" 
+
+# Pages Functions 没有 Flagship 绑定，使用 OpenFeature HTTP provider 读取。
+# 下面两个是引导凭据，不是业务配置；用 wrangler pages secret put 设置。
+# FLAGSHIP_ACCOUNT_ID = ""
+# FLAGSHIP_API_TOKEN = ""

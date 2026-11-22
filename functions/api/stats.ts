@@ -1,5 +1,6 @@
 import { cstToday, isoWeek, rangeStart } from '../../shared/date';
 import { listJudged, listJudgedDesc } from '../../shared/db';
+import { loadEnv } from '../../shared/flags';
 import { json } from '../../shared/http';
 import type { Direction, Env, JournalRow } from '../../shared/types';
 
@@ -17,7 +18,8 @@ function emptyMatrix(): Record<Direction, Record<Direction, number>> {
   };
 }
 
-export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestGet: PagesFunction<Env> = async ({ request, env: rawEnv }) => {
+  const env = await loadEnv(rawEnv);
   const range = new URL(request.url).searchParams.get('range') ?? '30d';
   const today = cstToday();
   const from = rangeStart(range, today);

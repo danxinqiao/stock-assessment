@@ -15,9 +15,12 @@ export interface Env {
   DB: D1Database;
   STOCK_SECID: string;
   WX_PUSH_URL: string;
-  WX_PUSH_TOKEN: string;
-  WX_TOKEN: string;
+  WECHAT_TOKEN: string;
   CRON_SECRET: string;
+  WX_REPLY_URL: string;
+  WX_REPLY?: Fetcher;
+  FLAGSHIP_ACCOUNT_ID?: string;
+  FLAGSHIP_API_TOKEN?: string;
 }
 
 export interface ReminderResult {

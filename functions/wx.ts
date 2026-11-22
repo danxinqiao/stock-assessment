@@ -1,5 +1,6 @@
 import { cstClock, cstToday, weekdayCn } from '../shared/date';
 import { setMeta, upsertGuess } from '../shared/db';
+import { loadEnv } from '../shared/flags';
 import type { Direction, Env } from '../shared/types';
 import { textReply, verifySignature, xmlField } from '../shared/wechat';
 
@@ -26,7 +27,8 @@ function xmlResponse(body: string): Response {
   });
 }
 
-export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestGet: PagesFunction<Env> = async ({ request, env: rawEnv }) => {
+  const env = await loadEnv(rawEnv);
   const url = new URL(request.url);
   const signature = url.searchParams.get('signature');
   const timestamp = url.searchParams.get('timestamp');
@@ -40,7 +42,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     });
   }
 
-  const ok = await verifySignature(env.WX_TOKEN, timestamp, nonce, signature);
+  const ok = await verifySignature(env.WECHAT_TOKEN, timestamp, nonce, signature);
   if (!ok) {
     console.error('[wx] signature mismatch');
     return new Response('signature mismatch', { status: 403 });
@@ -53,7 +55,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   });
 };
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestPost: PagesFunction<Env> = async ({ request, env: rawEnv }) => {
+  const env = await loadEnv(rawEnv);
   const url = new URL(request.url);
   const signature = url.searchParams.get('signature');
   const timestamp = url.searchParams.get('timestamp');
@@ -63,7 +66,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     return new Response('missing signature', { status: 403 });
   }
 
-  const ok = await verifySignature(env.WX_TOKEN, timestamp, nonce, signature);
+  const ok = await verifySignature(env.WECHAT_TOKEN, timestamp, nonce, signature);
   if (!ok) {
     console.error('[wx] post signature mismatch');
     return new Response('signature mismatch', { status: 403 });

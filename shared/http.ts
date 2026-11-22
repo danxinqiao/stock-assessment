@@ -1,3 +1,5 @@
+import { verifyRequestSignature } from './sign';
+
 export function json(
   data: unknown,
   status = 200,
@@ -30,4 +32,15 @@ export function isCronAuthorized(
   if (!secret) return false;
   const token = request.headers.get('X-Cron-Token') ?? '';
   return token.length > 0 && safeEqual(token, secret);
+}
+
+/**
+ * 优先校验 wx-reply 签名，失败时兼容旧的 X-Cron-Token。
+ */
+export async function isRequestAuthorized(
+  request: Request,
+  env: { CRON_SECRET?: string; WX_REPLY_URL?: string },
+): Promise<boolean> {
+  if (await verifyRequestSignature(request, env)) return true;
+  return isCronAuthorized(request, env);
 }

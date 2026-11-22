@@ -40,9 +40,8 @@ wrangler d1 create stock-journal
 wrangler d1 execute stock-journal --remote --file=./migrations/0001_init.sql
 
 # 三个 secret（值见方案文档）
-wrangler pages secret put CRON_SECRET   # worker-cron 与 wx-reply 调 Pages 内部接口共用
-wrangler pages secret put WX_PUSH_TOKEN   # Supabase 的 WECHAT_API_TOKEN 原值，不带 Bearer 前缀
-# WX_TOKEN 配在 wx-reply Worker（wrangler secret put WX_TOKEN），Pages 不再需要
+wrangler pages secret put CRON_SECRET   # worker-cron、wx-reply、wx-push 共用
+# WECHAT_TOKEN 配在 wx-reply Worker（wrangler secret put WECHAT_TOKEN），Pages 不再需要
 ```
 
 微信后台「服务器配置」：
@@ -50,7 +49,7 @@ wrangler pages secret put WX_PUSH_TOKEN   # Supabase 的 WECHAT_API_TOKEN 原值
 | 字段 | 值 |
 |---|---|
 | URL | `https://stock.gyegt614.top/wx` |
-| Token | 与 `WX_TOKEN` 一致 |
+| Token | 与 `WECHAT_TOKEN` 一致 |
 | 加解密方式 | 明文 |
 
 ## 本地开发

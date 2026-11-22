@@ -1,9 +1,11 @@
-import { errorJson, isCronAuthorized, json } from '../../../shared/http';
+import { loadEnv } from '../../../shared/flags';
+import { errorJson, isRequestAuthorized, json } from '../../../shared/http';
 import { settle } from '../../../shared/settle';
 import type { Env } from '../../../shared/types';
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
-  if (!isCronAuthorized(request, env)) {
+export const onRequestPost: PagesFunction<Env> = async ({ request, env: rawEnv }) => {
+  const env = await loadEnv(rawEnv);
+  if (!(await isRequestAuthorized(request, env))) {
     return errorJson('Unauthorized', 401);
   }
 

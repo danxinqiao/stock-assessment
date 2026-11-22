@@ -1,5 +1,6 @@
 import { cstNow, cstToday, daysAgo, isWeekend, weekdayCn } from './date';
 import { getMeta, recentStats, setMeta } from './db';
+import { signHeaders } from './sign';
 import type { Env, ReminderResult } from './types';
 
 export async function sendReminder(env: Env): Promise<ReminderResult> {
@@ -31,12 +32,12 @@ export async function sendReminder(env: Env): Promise<ReminderResult> {
   };
 
   const base = env.WX_PUSH_URL.replace(/\/+$/, '');
+  const signed = await signHeaders(env);
   const response = await fetch(`${base}/stock-remind`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      // Supabase wx-push 的 validateToken 是裸比较：authHeader === WECHAT_API_TOKEN
-      Authorization: env.WX_PUSH_TOKEN,
+      ...signed,
     },
     body: JSON.stringify(payload),
   });

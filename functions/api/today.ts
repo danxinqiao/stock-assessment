@@ -1,10 +1,12 @@
 import { cstToday, weekdayCn } from '../../shared/date';
 import { getJournal, getMeta } from '../../shared/db';
 import { getPercentMap } from '../../shared/eastmoney';
+import { loadEnv } from '../../shared/flags';
 import { json } from '../../shared/http';
 import type { Env } from '../../shared/types';
 
-export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
+export const onRequestGet: PagesFunction<Env> = async ({ env: rawEnv }) => {
+  const env = await loadEnv(rawEnv);
   const today = cstToday();
   const [row, lastRemind] = await Promise.all([
     getJournal(env.DB, today),
