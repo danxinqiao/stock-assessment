@@ -40,8 +40,8 @@ export default function ContributionGrid({ tradingDays, items, selected, onSelec
   }
 
   const weeks = Array.from(weekMap.entries())
-    .sort((a, b) => (a[0] < b[0] ? -1 : 1))
-    .slice(-MAX_WEEKS)
+    .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+    .slice(0, MAX_WEEKS)
     .map(([key, days]) => {
       const firstDate = days.find((day): day is string => Boolean(day)) ?? key;
       return { key, days, month: Number(firstDate.slice(5, 7)) };
