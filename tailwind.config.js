@@ -9,6 +9,14 @@ export default {
         none: '#e5e7eb',
       },
       fontFamily: {
+        sans: [
+          'Geist',
+          'PingFang SC',
+          'Hiragino Sans GB',
+          'Noto Sans CJK SC',
+          'Microsoft YaHei',
+          'sans-serif',
+        ],
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
     },

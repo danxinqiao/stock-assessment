@@ -8,19 +8,20 @@ interface Props {
   onSelect: (date: string) => void;
 }
 
-const MAX_WEEKS = 20;
+const MAX_WEEKS = 28;
+const WEEKDAY_LABELS = ['一', '', '三', '', '五', '', ''];
 
-function cellColor(result: LogItem['result'] | undefined): string {
-  if (result === 'hit') return 'bg-green-500 hover:bg-green-600';
-  if (result === 'miss') return 'bg-red-500 hover:bg-red-600';
-  return 'bg-slate-200 hover:bg-slate-300';
+function cellTone(result: LogItem['result'] | undefined): 'hit' | 'miss' | 'pending' {
+  if (result === 'hit') return 'hit';
+  if (result === 'miss') return 'miss';
+  return 'pending';
 }
 
-function cellTitle(date: string, item: LogItem | undefined): string {
+function cellLabel(date: string, item: LogItem | undefined): string {
   if (!item) return `${date} ${weekdayOf(date)} · 未判断`;
   const actual = item.actual ? ACTUAL_LABEL[item.actual] : '待定';
-  const mark = item.result === 'hit' ? '✓' : item.result === 'miss' ? '✗' : '…';
-  return `${date} ${item.weekday} ${GUESS_LABEL[item.guess]}→${actual} ${mark}`;
+  const mark = item.result === 'hit' ? '命中' : item.result === 'miss' ? '未中' : '待定';
+  return `${date} ${item.weekday} ${GUESS_LABEL[item.guess]} → ${actual} · ${mark}`;
 }
 
 export default function ContributionGrid({ tradingDays, items, selected, onSelect }: Props) {
@@ -42,63 +43,61 @@ export default function ContributionGrid({ tradingDays, items, selected, onSelec
     .sort((a, b) => (a[0] < b[0] ? -1 : 1))
     .slice(-MAX_WEEKS)
     .map(([key, days]) => {
-      const firstDate = days.find((d): d is string => Boolean(d)) ?? key;
+      const firstDate = days.find((day): day is string => Boolean(day)) ?? key;
       return { key, days, month: Number(firstDate.slice(5, 7)) };
     });
 
+  if (weeks.length === 0) {
+    return <div className="grid-empty">还没有判断记录</div>;
+  }
+
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-slate-700">判断记录</h2>
-        <div className="flex items-center gap-3 text-[11px] text-slate-500">
-          <span className="flex items-center gap-1">
-            <i className="h-2.5 w-2.5 rounded-sm bg-green-500" />对
-          </span>
-          <span className="flex items-center gap-1">
-            <i className="h-2.5 w-2.5 rounded-sm bg-red-500" />错
-          </span>
-          <span className="flex items-center gap-1">
-            <i className="h-2.5 w-2.5 rounded-sm bg-slate-200" />未判断
-          </span>
+    <div className="grid-scroll">
+      <div className="grid-inner">
+        <div className="grid-weekdays" aria-hidden="true">
+          {WEEKDAY_LABELS.map((label, index) => (
+            <div className="grid-weekday" key={`weekday-${index}`}>
+              {label}
+            </div>
+          ))}
+        </div>
+
+        <div className="grid-weeks">
+          {weeks.map((week, weekIndex) => {
+            const previousMonth = weekIndex > 0 ? weeks[weekIndex - 1].month : null;
+            const showMonth = weekIndex === 0 || week.month !== previousMonth;
+
+            return (
+              <div className="grid-week" key={week.key}>
+                <div className="grid-month">{showMonth ? `${week.month}月` : ''}</div>
+                {week.days.map((date, row) => {
+                  if (!date) {
+                    return <span className="grid-cell blank" key={`blank-${week.key}-${row}`} />;
+                  }
+
+                  const item = itemMap.get(date);
+                  const label = cellLabel(date, item);
+                  return (
+                    <button
+                      key={date}
+                      type="button"
+                      title={label}
+                      aria-label={label}
+                      aria-pressed={selected === date}
+                      onClick={() => onSelect(date)}
+                      className={
+                        'grid-cell ' +
+                        cellTone(item?.result) +
+                        (selected === date ? ' selected' : '')
+                      }
+                    />
+                  );
+                })}
+              </div>
+            );
+          })}
         </div>
       </div>
-
-      {weeks.length === 0 ? (
-        <div className="mt-4 py-8 text-center text-sm text-slate-400">还没有判断记录</div>
-      ) : (
-        <div className="mt-3 overflow-x-auto pb-1">
-          <div className="flex min-w-max gap-[3px]">
-            {weeks.map((week, index) => {
-              const prevMonth = index > 0 ? weeks[index - 1].month : null;
-              const showMonth = index === 0 || week.month !== prevMonth;
-              return (
-                <div key={week.key} className="flex flex-col gap-[3px]">
-                  <div className="h-4 text-[10px] leading-4 text-slate-400">
-                    {showMonth ? `${week.month}月` : ''}
-                  </div>
-                  {week.days.map((date, row) =>
-                    date ? (
-                      <button
-                        key={date}
-                        type="button"
-                        title={cellTitle(date, itemMap.get(date))}
-                        onClick={() => onSelect(date)}
-                        className={
-                          'h-3 w-3 rounded-sm transition ' +
-                          cellColor(itemMap.get(date)?.result) +
-                          (selected === date ? ' ring-2 ring-slate-900 ring-offset-1' : '')
-                        }
-                      />
-                    ) : (
-                      <div key={`empty-${row}`} className="h-3 w-3" />
-                    ),
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </section>
+    </div>
   );
 }

@@ -1,41 +1,68 @@
 import type { StatsResponse } from '../lib/api';
 import { rateText } from '../lib/format';
+import Dash from './Dash';
 
 export default function StatCards({ stats }: { stats: StatsResponse | null }) {
   if (!stats) {
-    return <div className="h-28 animate-pulse rounded-xl bg-slate-100" />;
+    return (
+      <section className="kpi" aria-label="关键指标" aria-busy="true">
+        <div className="kpi-cell">
+          <div className="skeleton skeleton-line short" style={{ marginTop: 0 }} />
+          <div className="skeleton skeleton-value" />
+          <div className="skeleton skeleton-line short" />
+        </div>
+        <div className="kpi-cell">
+          <div className="skeleton skeleton-line short" style={{ marginTop: 0 }} />
+          <div className="skeleton skeleton-value small" />
+          <div className="skeleton skeleton-line short" />
+        </div>
+        <div className="kpi-cell">
+          <div className="skeleton skeleton-line short" style={{ marginTop: 0 }} />
+          <div className="skeleton skeleton-value small" />
+          <div className="skeleton skeleton-line short" />
+        </div>
+      </section>
+    );
   }
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
-        <div className="text-xs text-slate-500">准确率</div>
-        <div className="mt-1 text-4xl font-semibold tabular-nums text-slate-900">
-          {rateText(stats.accuracy)}
+    <section className="kpi" aria-label="关键指标">
+      <div className="kpi-cell">
+        <div className="kpi-label">准确率</div>
+        <div className={stats.accuracy === null ? 'kpi-value is-empty' : 'kpi-value lead num'}>
+          {stats.accuracy === null ? <Dash label="暂无准确率" /> : rateText(stats.accuracy)}
         </div>
-        <div className="mt-1 text-xs text-slate-400">
+        <div className="kpi-meta">
           命中 {stats.hit} / {stats.total}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <div className="text-xs text-slate-500">二元方向</div>
-          <div className="mt-1 text-2xl font-semibold tabular-nums text-slate-900">
-            {rateText(stats.binary.accuracy)}
-          </div>
-          <div className="mt-1 text-xs text-slate-400">
-            {stats.binary.hit} / {stats.binary.total}
-          </div>
+      <div className="kpi-cell">
+        <div className="kpi-label">二元方向</div>
+        <div
+          className={
+            stats.binary.accuracy === null ? 'kpi-value is-empty' : 'kpi-value num'
+          }
+        >
+          {stats.binary.accuracy === null ? (
+            <Dash label="暂无二元方向准确率" />
+          ) : (
+            rateText(stats.binary.accuracy)
+          )}
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <div className="text-xs text-slate-500">当前连胜</div>
-          <div className="mt-1 text-2xl font-semibold tabular-nums text-slate-900">
-            {stats.streak}
-          </div>
-          <div className="mt-1 text-xs text-slate-400">连续命中</div>
+        <div className="kpi-meta">
+          命中 {stats.binary.hit} / {stats.binary.total}
         </div>
       </div>
-    </div>
+
+      <div className="kpi-cell">
+        <div className="kpi-label">当前连胜</div>
+        <div className="kpi-value num">
+          {stats.streak}
+          <span className="kpi-unit">次</span>
+        </div>
+        <div className="kpi-meta">连续命中</div>
+      </div>
+    </section>
   );
 }

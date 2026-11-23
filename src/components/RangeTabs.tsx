@@ -13,20 +13,16 @@ interface Props {
 
 export default function RangeTabs({ value, onChange }: Props) {
   return (
-    <div className="flex flex-wrap gap-1 rounded-lg bg-slate-100 p-1">
+    <div className="seg" role="tablist" aria-label="统计区间">
       {RANGES.map((item) => {
         const active = item.key === value;
         return (
           <button
             key={item.key}
             type="button"
+            role="tab"
+            aria-selected={active}
             onClick={() => onChange(item.key)}
-            className={
-              'flex-1 whitespace-nowrap rounded-md px-3 py-1.5 text-sm transition ' +
-              (active
-                ? 'bg-white font-medium text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700')
-            }
           >
             {item.label}
           </button>

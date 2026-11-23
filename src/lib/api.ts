@@ -57,6 +57,8 @@ async function getJson<T>(url: string): Promise<T> {
 export const api = {
   today: () => getJson<TodayResponse>('/api/today'),
   stats: (range: string) => getJson<StatsResponse>(`/api/stats?range=${encodeURIComponent(range)}`),
-  log: (before?: string | null) =>
-    getJson<LogResponse>(`/api/log?limit=50${before ? `&before=${encodeURIComponent(before)}` : ''}`),
+  log: (before?: string | null, limit = 50) =>
+    getJson<LogResponse>(
+      `/api/log?limit=${limit}${before ? `&before=${encodeURIComponent(before)}` : ''}`,
+    ),
 };

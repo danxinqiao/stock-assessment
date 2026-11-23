@@ -6,6 +6,9 @@ dist
 *.log
 *.tsbuildinfo
 
+# Local design review artifacts
+.taste-skill
+
 # OS / editor junk
 .DS_Store
 Thumbs.db

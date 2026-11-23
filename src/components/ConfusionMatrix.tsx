@@ -5,51 +5,69 @@ const DIRS: Direction[] = ['up', 'down', 'flat'];
 
 export default function ConfusionMatrix({ stats }: { stats: StatsResponse | null }) {
   if (!stats) {
-    return <div className="h-40 animate-pulse rounded-xl bg-slate-100" />;
+    return (
+      <section className="panel" aria-busy="true">
+        <div className="panel-head">
+          <div className="skeleton skeleton-line" style={{ width: 88, marginTop: 0 }} />
+        </div>
+        <div className="panel-body">
+          <div className="skeleton skeleton-panel" style={{ minHeight: 190 }} />
+        </div>
+      </section>
+    );
   }
 
+  const rowTotal = (guess: Direction) =>
+    DIRS.reduce((sum, actual) => sum + stats.matrix[guess][actual], 0);
+  const colTotal = (actual: Direction) =>
+    DIRS.reduce((sum, guess) => sum + stats.matrix[guess][actual], 0);
+
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4">
-      <h2 className="text-sm font-medium text-slate-700">混淆矩阵</h2>
-      <table className="mt-3 w-full text-center text-sm">
-        <thead>
-          <tr className="text-xs text-slate-400">
-            <th className="py-1 text-left font-normal">预测 \ 实际</th>
-            {DIRS.map((dir) => (
-              <th key={dir} className="py-1 font-normal">
-                {ACTUAL_LABEL[dir]}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {DIRS.map((guess) => (
-            <tr key={guess} className="border-t border-slate-100">
-              <td className="py-2 text-left text-xs text-slate-500">{GUESS_LABEL[guess]}</td>
-              {DIRS.map((actual) => {
-                const value = stats.matrix[guess][actual];
-                const onDiagonal = guess === actual;
-                return (
-                  <td key={actual} className="py-2">
-                    <span
-                      className={
-                        'inline-flex h-8 w-10 items-center justify-center rounded-md tabular-nums ' +
-                        (onDiagonal
-                          ? 'bg-green-50 font-medium text-green-700'
-                          : value > 0
-                            ? 'text-red-600'
-                            : 'text-slate-300')
-                      }
-                    >
-                      {value}
-                    </span>
-                  </td>
-                );
-              })}
+    <section className="panel">
+      <div className="panel-head">
+        <h2 className="panel-title">混淆矩阵</h2>
+        <span className="panel-note">预测 / 实际 · 共 {stats.total} 次</span>
+      </div>
+      <div className="panel-body">
+        <table className="matrix">
+          <thead>
+            <tr>
+              <th>预测 / 实际</th>
+              {DIRS.map((dir) => (
+                <th key={dir}>{ACTUAL_LABEL[dir]}</th>
+              ))}
+              <th>合计</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {DIRS.map((guess) => (
+              <tr key={guess}>
+                <th scope="row">{GUESS_LABEL[guess]}</th>
+                {DIRS.map((actual) => {
+                  const value = stats.matrix[guess][actual];
+                  const diagonal = guess === actual;
+                  const tone = diagonal ? 'diag' : value > 0 ? 'err' : 'zero';
+                  return (
+                    <td key={actual}>
+                      <span className={`matrix-cell ${tone}`}>{value}</span>
+                    </td>
+                  );
+                })}
+                <td className="total">{rowTotal(guess)}</td>
+              </tr>
+            ))}
+            <tr className="matrix-foot">
+              <th scope="row">合计</th>
+              {DIRS.map((actual) => (
+                <td key={actual} className="total">
+                  {colTotal(actual)}
+                </td>
+              ))}
+              <td className="total">{stats.total}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
