@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@cloudflare/flagship": "^0.7.0",
+    "@openfeature/server-sdk": "^1.23.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.13.3"

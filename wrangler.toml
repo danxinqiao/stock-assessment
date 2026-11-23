@@ -1,6 +1,7 @@
 name = "stock-assessment"
 pages_build_output_dir = "./dist"
 compatibility_date = "2026-07-11"
+compatibility_flags = ["nodejs_compat"]
 
 # D1：先在 Pages 项目里建好库，再把 id 填进来
 [[d1_databases]]
@@ -22,7 +23,7 @@ service = "wx-reply"
 # WX_REPLY_URL = "https://wx.gyegt614.top"
 # 占位 WECHAT_TOKEN = "" 
 
-# Pages Functions 没有 Flagship 绑定，使用 OpenFeature HTTP provider 读取。
+# Pages Functions 没有 Flagship 绑定，使用 OpenFeature server provider 本地评估读取。
 # 下面两个是引导凭据，不是业务配置；用 wrangler pages secret put 设置。
 # FLAGSHIP_ACCOUNT_ID = ""
 # FLAGSHIP_API_TOKEN = ""

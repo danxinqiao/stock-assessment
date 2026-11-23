@@ -24,23 +24,12 @@ export function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-export function isCronAuthorized(
-  request: Request,
-  env: { CRON_SECRET?: string },
-): boolean {
-  const secret = env.CRON_SECRET;
-  if (!secret) return false;
-  const token = request.headers.get('X-Cron-Token') ?? '';
-  return token.length > 0 && safeEqual(token, secret);
-}
-
 /**
- * 优先校验 wx-reply 签名，失败时兼容旧的 X-Cron-Token。
+ * 只接受 wx-reply 签名，不再兼容旧的 X-Cron-Token。
  */
 export async function isRequestAuthorized(
   request: Request,
-  env: { CRON_SECRET?: string; WX_REPLY_URL?: string },
+  env: { WX_REPLY_URL?: string; WX_REPLY?: Fetcher; CRON_SECRET?: string },
 ): Promise<boolean> {
-  if (await verifyRequestSignature(request, env)) return true;
-  return isCronAuthorized(request, env);
+  return verifyRequestSignature(request, env);
 }

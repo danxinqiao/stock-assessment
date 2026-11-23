@@ -51,7 +51,7 @@ export async function verifyRequestSignature(
 
 /**
  * 从 wx-reply 获取一次签名，用于请求其他 Worker / Pages Function。
- * 失败时返回空对象，调用方可继续使用旧的 X-Cron-Token 兼容。
+ * 失败时返回空对象，调用方应记录错误并放弃本次请求。
  */
 export async function signHeaders(env: SignConfig): Promise<Record<string, string>> {
   if (!env.CRON_SECRET) return {};

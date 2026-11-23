@@ -76,19 +76,19 @@ wrangler pages dev dist   # 前后端一起跑，绑定读 wrangler.toml
 |---|---|---|
 | GET | `/wx` | 微信验签（过渡版，迁到 wx-reply Worker 后在 M2-d 删除） |
 | POST | `/wx` | 收消息（同上，过渡保留） |
-| POST | `/api/wx/callback` | wx-reply → 业务：收 `{type, openid, content}`，回 `{reply}`，需 `X-Cron-Token` |
+| POST | `/api/wx/callback` | wx-reply → 业务：收 `{type, openid, content}`，回 `{reply}`，需 wx-reply 签名 `X-Sign-Timestamp` / `X-Signature` |
 | GET | `/api/today` | 今日状态 |
 | GET | `/api/stats?range=7d\|30d\|90d\|ytd\|all` | 区间统计 |
 | GET | `/api/log?before=YYYY-MM-DD&limit=50` | 明细 + `tradingDays` |
-| POST | `/api/cron/remind` | 09:00 提醒，需 `X-Cron-Token` |
-| POST | `/api/cron/settle` | 收盘判定，需 `X-Cron-Token`，body `{"round":1..3}` |
+| POST | `/api/cron/remind` | 09:00 提醒，需 wx-reply 签名 `X-Sign-Timestamp` / `X-Signature` |
+| POST | `/api/cron/settle` | 收盘判定，需 wx-reply 签名，body `{"round":1..3}` |
 
 ## 行为约定
 
 - 回复窗口 09:00–15:00，15:00 后回「今日已截止」，不写库。
 - 指令码：`101` 看涨 / `102` 看跌 / `103` 看平；其他 `10xxx` 回提示语。`20xxx`/`30xxx` 由 wx-reply 路由到预留目标（Pages 不处理）。
 - 未回复不写行，不进准确率分母。
-- 收盘判定跑三轮（15:10 / 15:40 / 16:30）；第三轮仍无当日 K 线 → 视为休市，删掉当天这行。
+- 收盘判定跑三轮（15:15 / 15:45 / 16:30）；第三轮仍无当日 K 线 → 视为休市，删掉当天这行。
 - 行情接口三轮都失败 → 保留该行、`actual` 为 NULL，页面显示灰格，不计入分母，不做事后补判。
 - `percent`（当日涨跌幅）不入库，由东方财富日 K 现取，进程内缓存 10 分钟；取不到时前端显示 `—`。
 - `/api/log` 除 `items`、`next` 外还返回 `tradingDays`（最近 140 个交易日），供贡献图区分「没判断」和「非交易日」。
